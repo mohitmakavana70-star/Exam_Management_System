@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add 10 MCQs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .question-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%; /* Ye add karo */
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: #4facfe;
+        }
+
+        .question-number {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .question-label {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+
+
+        .option-group {
+            display: flex !important;          /* Flexbox ON */
+            flex-direction: row !important;    /* Horizontal */
+            align-items: center !important;    /* Vertical center */
+            gap: 12px !important;              /* Space between */
+            padding: 18px 20px !important;     /* Padding */
+            transition: all 0.3s ease;
+            height: 60px;                      /* Fixed height */
+            overflow: hidden;
+        }
+
+        .option-group:hover {
+            border-color: #4facfe;
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.1);
+        }
+
+        .option-label {
+            font-weight: 700 !important;
+            color: #4a5568;
+            font-size: 1.1rem !important;
+            white-space: nowrap !important;    /* No wrap */
+            flex-shrink: 0 !important;         /* Fixed width */
+            padding: 8px 12px !important;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            min-width: 50px;                   /* Minimum width */
+            text-align: center;
+        }
+
+        .option-input {
+            flex: 1 !important;                /* Take remaining space */
+            padding: 12px 16px !important;
+            border: 2px solid #e8ecef !important;
+            border-radius: 8px !important;
+            font-size: 1rem !important;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            height: 44px;                      /* Fixed height */
+            margin: 0 !important;              /* No margin */
+        }
+
+        .option-input:focus {
+            outline: none;
+            border-color: #4facfe !important;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .option-group {
+                gap: 10px !important;
+                padding: 16px 16px !important;
+                height: 55px;
+            }
+
+            .option-label {
+                font-size: 1rem !important;
+                padding: 6px 10px !important;
+                min-width: 45px;
+            }
+
+            .option-input {
+                padding: 10px 14px !important;
+                height: 42px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .option-group {
+                gap: 8px !important;
+                padding: 14px 12px !important;
+            }
+
+            .option-label {
+                font-size: 0.95rem !important;
+                padding: 5px 8px !important;
+                min-width: 40px;
+            }
+        }
+
+        .correct-section {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            width: 100%; /* Ye add karo */
+            overflow: hidden; /* Ye add karo */
+        }
+
+        /* Radio group - STRICT ONE LINE */
+        .radio-group {
+            display: flex !important;
+            flex-direction: row !important; /* Force horizontal */
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+            justify-content: flex-start !important;
+            align-items: center !important;
+            width: 100% !important;
+            min-height: 50px;
+            padding: 12px 0 !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important; /* No vertical scroll */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            white-space: nowrap; /* No wrapping */
+        }
+
+        .radio-group::-webkit-scrollbar {
+            display: none;
+        }
+
+        .radio-option {
+            display: inline-flex !important; /* Inline flex */
+            align-items: center;
+            gap: 6px !important;
+            font-size: 1.1rem !important;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 10px 14px !important;
+            border-radius: 20px !important;
+            transition: all 0.3s ease;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+            margin: 0 !important;
+            line-height: 1 !important;
+        }
+
+        .radio-option:hover {
+            background: rgba(255, 255, 255, 0.35) !important;
+            transform: scale(1.05);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px !important;
+            height: 18px !important;
+            accent-color: white !important;
+            margin: 0 !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* HAR SCREEN PE ONE LINE */
+        @media (max-width: 1200px) {
+            .radio-group { gap: 6px !important; }
+            .radio-option { padding: 9px 12px !important; font-size: 1rem !important; }
+        }
+
+        @media (max-width: 768px) {
+            .radio-card { padding: 25px 15px !important; }
+            .radio-group {
+                gap: 5px !important;
+                padding: 10px 5px !important;
+            }
+            .radio-option {
+                padding: 8px 10px !important;
+                font-size: 0.95rem !important;
+                gap: 4px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .radio-group { gap: 4px !important; }
+            .radio-option {
+                padding: 7px 8px !important;
+                font-size: 0.9rem !important;
+            }
+            .radio-option input[type="radio"] {
+                width: 16px !important;
+                height: 16px !important;
+            }
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(79, 172, 254, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+            }
+
+            .header h2 {
+                font-size: 1.8rem;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .radio-option {
+                justify-content: flex-start;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .question-number {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .header {
+                padding: 25px 20px;
+            }
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transform: scale(0.7);
+            animation: modalSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(72, 187, 120, 0.5);
+        }
+
+        .btn-no {
+            background: transparent;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            padding: 14px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-no:hover {
+            background: #f7fafc;
+            transform: translateY(-2px);
+        }
+
+        /* GPay Style Success Animation */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(72, 187, 120, 0.15);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 25px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(72, 187, 120, 0.3);
+            transform: scale(0);
+            animation: successSlideIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .success-check {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
+            position: relative;
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .checkmark::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        .success-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #38a169;
+            margin-bottom: 10px;
+        }
+
+        .success-text {
+            color: #48bb78;
+            font-size: 1.1rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes successSlideIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .modal-container {
+                padding: 30px 25px;
+                margin: 20px;
+            }
+
+            .success-container {
+                padding: 40px 25px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+   <div class="container">
+        <div class="header">
+            <h2>📝 Add 10 MCQs</h2>
+            <p>Create your multiple choice questions with ease</p>
+        </div>
+
+        <div class="form-container">
+            <!-- ✅ SINGLE FORM - Ye important hai -->
+            <form method="POST" id="mcqForm" onsubmit="return showConfirm(event)">
+
+                {% for i in range(1,11) %}
+                <div class="question-card">
+                    <div class="question-number">Q{{i}}</div>
+
+                    <div class="question-label">
+                        <span>📋</span>
+                        Question {{i}}
+                    </div>
+                    <input type="text" name="q{{i}}" class="question-input" placeholder="Enter your question here..." required>
+
+                    <div class="options-grid">
+                        <div class="option-group">
+                            <label class="option-label">A:</label>
+                            <input type="text" name="a{{i}}" class="option-input" placeholder="Option A" required>
+                        </div>
+                        <div class="option-group">
+                            <label class="option-label">B:</label>
+                            <input type="text" name="b{{i}}" class="option-input" placeholder="Option B" required>
+                        </div>
+                        <div class="option-group">
+                            <label class="option-label">C:</label>
+                            <input type="text" name="c{{i}}" class="option-input" placeholder="Option C" required>
+                        </div>
+                        <div class="option-group">
+                            <label class="option-label">D:</label>
+                            <input type="text" name="d{{i}}" class="option-input" placeholder="Option D" required>
+                        </div>
+                    </div>
+
+                    <div class="correct-section">
+                        <h4>✅ Select Correct Answer</h4>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="ans{{i}}" value="a" required> A
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="ans{{i}}" value="b"> B
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="ans{{i}}" value="c"> C
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="ans{{i}}" value="d"> D
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- ✅ Submit Button INSIDE Form -->
+                <button type="submit" class="submit-btn">
+                    💾 Save All Questions
+                </button>
+            </form> <!-- Form END -->
+
+            <!-- ✅ Modals OUTSIDE Form but INSIDE Body -->
+        </div>
+    </div>
+
+    <!-- ✅ Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-container">
+            <div class="modal-icon">❓</div>
+            <div class="modal-title">Save All Questions?</div>
+            <div class="modal-text">Are you sure you want to save all 10 questions?</div>
+            <div class="modal-buttons">
+                <button class="btn-yes" onclick="saveQuestions()">Yes</button>
+                <button class="btn-no" onclick="cancelSave()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Success Animation Modal -->
+    <div class="success-overlay" id="successModal">
+        <div class="success-container">
+            <div class="success-check">
+                <div class="checkmark">✅</div>
+            </div>
+            <div class="success-title">Questions Saved!</div>
+            <div class="success-text">All 10 questions saved successfully</div>
+        </div>
+    </div>
+
+   <script>
+        function showConfirm(event) {
+            event.preventDefault(); // Form submit rok do
+            document.getElementById('confirmModal').style.display = 'flex';
+            return false;
+        }
+
+        function saveQuestions() {
+            // Confirmation modal hide karo
+            document.getElementById('confirmModal').style.display = 'none';
+
+            // Success animation dikhao (GPay style)
+            setTimeout(() => {
+                document.getElementById('successModal').style.display = 'flex';
+            }, 200);
+
+            // 2 seconds baad actual form submit karo
+            setTimeout(() => {
+                document.getElementById('mcqForm').submit();
+            }, 2500);
+        }
+
+        function cancelSave() {
+            document.getElementById('confirmModal').style.display = 'none';
+            // Same page pe reh jao ✅
+        }
+
+        // Outside click se modal close
+        window.onclick = function(event) {
+            const confirmModal = document.getElementById('confirmModal');
+            const successModal = document.getElementById('successModal');
+
+            if (event.target === confirmModal) {
+                cancelSave();
+            }
+            if (event.target === successModal) {
+                successModal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

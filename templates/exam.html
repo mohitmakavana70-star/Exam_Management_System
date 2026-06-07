@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Exam - Secure Mode</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Security Overlay */
+        .security-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .security-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .security-icon {
+            font-size: 80px;
+            color: #ef4444;
+            margin-bottom: 20px;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            height: 100vh;
+            display: flex;
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ffffff, #e0e7ff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            box-shadow: 0 15px 35px rgba(255,255,255,0.2);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timer {
+            background: rgba(239,68,68,0.2);
+            border: 2px solid rgba(239,68,68,0.5);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .time-display {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ef4444;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .q-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .q-nav-btn:hover, .q-nav-btn.active {
+            background: #10b981;
+            border-color: #10b981;
+            transform: scale(1.05);
+        }
+
+        .main-content {
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 40px;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-5px);
+        }
+
+        .question-header {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+        }
+        .question-number {
+            min-width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8fafc;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background: #e0f2fe;
+            border-color: #3b82f6;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            accent-color: #3b82f6;
+            cursor: pointer;
+        }
+
+        .option-label {
+            font-size: 16px;
+            color: #374151;
+            user-select: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(16,185,129,0.4);
+        }
+
+        .security-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(16,185,129,0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+            .sidebar { width: 100%; }
+            .main-content { padding: 25px; }
+            h1 { font-size: 24px; }
+        }
+
+        /* Scrollbar */
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 999;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            width: 320px;
+        }
+
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ok-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .cancel-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Security Overlay -->
+    <div class="security-overlay" id="securityOverlay">
+        <div class="security-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2>Security Alert!</h2>
+        <p>Cheating detected. Exam submitted automatically.</p>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>Online Exam</h1>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="question-nav" id="questionNav">
+                <!-- Dynamic question navigation -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <form method="POST" id="examForm">
+                {% for q in questions %}
+                <div class="question-card" data-question="{{ q[0] }}"><div class="question-header">
+                    <div class="question-number">Q{{ loop.index }}</div>
+                    <div class="question-text">{{ q[1] }}</div>
+                </div>
+
+                    <label class="option">
+                        <input type="radio" name="{{ q[0] }}" value="a" required>
+                        <span class="option-label">A) {{ q[2] }}</span>
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="{{ q[0] }}" value="b">
+                        <span class="option-label">B) {{ q[3] }}</span>
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="{{ q[0] }}" value="c">
+                        <span class="option-label">C) {{ q[4] }}</span>
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="{{ q[0] }}" value="d">
+                        <span class="option-label">D) {{ q[5] }}</span>
+                    </label>
+                </div>
+                {% endfor %}
+
+                <button type="button" class="submit-btn" onclick="openModal()">
+                    <i class="fas fa-paper-plane"></i> Submit Exam
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+<div id="confirmModal" class="modal">
+    <div class="modal-box">
+        <h2>Are you sure?</h2>
+        <p>Are you sure you want to complete the exam?</p>
+
+        <div class="modal-actions">
+            <button class="ok-btn" onclick="confirmSubmit()">OK</button>
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+    <script>
+        let submitted = false;
+        let timeLeft = 30 * 60; // 30 minutes
+        let questionCount = {{ questions|length }};
+
+        // =======================
+        // ✅ ENHANCED ANTI-CHEAT
+        // =======================
+        function showSecurityOverlay() {
+            document.getElementById('securityOverlay').classList.add('active');
+        }
+
+        function sendViolation() {
+            if (submitted) return;
+            submitted = true;
+
+            const form = document.getElementById('examForm');
+            const data = new FormData(form);
+
+            fetch("/violation", {
+                method: "POST",
+                body: data
+            }).then(() => {
+                showSecurityOverlay();
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 2000);
+            });
+        }
+
+        // Tab change detection
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                sendViolation();
+            }
+        });
+
+        // Fullscreen (desktop only)
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        }
+
+        window.onload = function() {
+            if (!isMobile()) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        };
+
+        document.addEventListener("fullscreenchange", function() {
+            if (!isMobile() && !document.fullscreenElement) {
+                sendViolation();
+            }
+        });
+
+         // Resize detection (desktop)
+        let initialWidth = window.innerWidth;
+        window.addEventListener("resize", function() {
+            if (!isMobile() && Math.abs(window.innerWidth - initialWidth) > 200) {
+                sendViolation();
+            }
+        });
+
+        // Question navigation
+        function updateQuestionNav() {
+    const nav = document.getElementById('questionNav');
+    nav.innerHTML = '';
+
+    for (let i = 1; i <= questionCount; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'q-nav-btn';
+        btn.textContent = i;
+
+        btn.setAttribute('data-num', i); // ✅ ADD THIS
+
+        btn.onclick = () => scrollToQuestion(i);
+        nav.appendChild(btn);
+    }
+}
+
+       function scrollToQuestion(num) {
+                const card = document.querySelector(`[data-question="${num}"]`);
+                const container = document.querySelector('.main-content');
+                const activeBtn = document.querySelector(`[data-num="${num}"]`);
+
+                if (card && container) {
+                    const yOffset = -340;
+
+                    const y = card.offsetTop + yOffset;
+
+                    container.scrollTo({
+                        top: y,
+                        behavior: "smooth"
+                    });
+
+                    document.querySelectorAll('.q-nav-btn')
+                        .forEach(b => b.classList.remove('active'));
+
+                    if (activeBtn) activeBtn.classList.add('active');
+                }
+            }
+        updateQuestionNav();
+
+        // Prevent right-click, F12, Ctrl+U
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+                return false;
+            }
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+                return false;
+            }
+            if(e.keyCode == 85 && e.ctrlKey) {
+                return false;
+            }
+        };
+
+        function openModal() {
+                document.getElementById("confirmModal").classList.add("active");
+            }
+
+            function closeModal() {
+                document.getElementById("confirmModal").classList.remove("active");
+            }
+
+            function confirmSubmit() {
+                    const form = document.getElementById("examForm");
+
+                    // form submit karo (backend pe jayega)
+                    form.submit();
+
+                    // optional: button disable (double click avoid)
+                }
+
+    </script>
+</body>
+</html>
